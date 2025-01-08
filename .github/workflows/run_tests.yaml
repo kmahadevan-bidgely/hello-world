@@ -51,7 +51,16 @@ jobs:
       - name: Evaluate Coverage Diff
         id: diff-coverage
         run: |
-          git fetch origin $DEFAULT_BRANCH:$DEFAULT_BRANCH
+          # Fetch the default branch with all commits
+          git fetch --no-tags --prune --depth=1 origin $DEFAULT_BRANCH
+          
+          # Verify the default branch exists locally
+          git branch --track $DEFAULT_BRANCH origin/$DEFAULT_BRANCH || echo "$DEFAULT_BRANCH already exists locally"
+          
+          # Checkout the default branch to ensure it's locally available
+          git checkout $DEFAULT_BRANCH
+          
+          # Run diff-cover
           diff-cover target/site/jacoco/jacoco.xml --compare-branch=$DEFAULT_BRANCH --html-report diff-cover-report.html --fail-under=90 > diff-coverage-result.txt || true
 
       # Step 8: Extract Coverage Numbers
