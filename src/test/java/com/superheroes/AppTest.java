@@ -11,4 +11,10 @@ public class AppTest {
     public void shouldAnswerWithTrue() {
         assertTrue(true);
     }
+
+    @Test
+    public void testSetUser() {
+        App app = new App();
+        app.setPerson("Jack");
+    }
 }
