@@ -51,7 +51,7 @@ jobs:
       - name: Evaluate Coverage Diff
         id: diff-coverage
         run: |
-          git fetch origin $DEFAULT_BRANCH
+          git fetch origin $DEFAULT_BRANCH:$DEFAULT_BRANCH
           diff-cover target/site/jacoco/jacoco.xml --compare-branch=$DEFAULT_BRANCH --html-report diff-cover-report.html --fail-under=90 > diff-coverage-result.txt || true
 
       # Step 8: Extract Coverage Numbers
