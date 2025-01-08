@@ -8,6 +8,11 @@ on:
 jobs:
   test-and-coverage:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
+      id-token: write
 
     steps:
       # Step 1: Check out the code
@@ -67,30 +72,24 @@ jobs:
       - name: Extract Coverage Numbers
         id: extract-coverage
         run: |
+          cat diff-coverage-result.txt
           COVERAGE=$(grep "Diff Coverage" diff-coverage-result.txt | awk '{print $3}')
+          echo "COVERAGE=${COVERAGE}"
           echo "COVERAGE=${COVERAGE}" >> $GITHUB_ENV
         shell: bash
 
       # Step 9: Post Coverage Comment on PR
       - name: Post Coverage on PR
         if: always()
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          COVERAGE=${{ env.COVERAGE }}
-          if [[ -z "$COVERAGE" ]]; then
-            COVERAGE="Failed to calculate"
-          fi
-          
-          # Install the gh CLI (if not already available)
-          sudo apt-get install -y gh
-          
-          # Authenticate gh CLI
-          echo $GITHUB_TOKEN | gh auth login --with-token
-          
-          # Post the comment
-          COMMENT_BODY="### Code Coverage Report\n\n- **Diff Coverage**: ${COVERAGE}%\n\n*This comment was generated automatically by GitHub Actions.*"
-          gh pr comment ${{ github.event.pull_request.number }} --body "$COMMENT_BODY"
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '### Code Coverage Report\n\n- **Diff Coverage**: ${{ env.COVERAGE }} d %\n\n*This comment was generated automatically by GitHub Actions.*'
+            })        
 
       # Step 10: Upload coverage report as a downloadable artifact
       - name: Upload Diff-Cover HTML Report
