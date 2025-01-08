@@ -58,7 +58,7 @@ jobs:
         run: |
           
           # Run diff-cover
-          diff-cover target/site/jacoco/jacoco.xml --compare-branch=main --html-report diff-cover-report.html --fail-under=90 > diff-coverage-result.txt || true
+          diff-cover target/site/jacoco/jacoco.xml --compare-branch=origin/main --html-report diff-cover-report.html --fail-under=90 > diff-coverage-result.txt || true
 
       # Step 8: Extract Coverage Numbers
       - name: Extract Coverage Numbers
