@@ -73,23 +73,29 @@ jobs:
         id: extract-coverage
         run: |
           cat diff-coverage-result.txt
-          COVERAGE=$(grep "Diff Coverage" diff-coverage-result.txt | awk '{print $3}')
+          COVERAGE=$(grep "Diff Coverage" diff-coverage-result.txt | awk '{print $3}' | tr -d '%')
           echo "COVERAGE=${COVERAGE}"
           echo "COVERAGE=${COVERAGE}" >> $GITHUB_ENV
         shell: bash
 
-      # Step 9: Post Coverage Comment on PR
+      # Step 9: Post Coverage Comment on PR using github-script
       - name: Post Coverage on PR
         if: always()
-      - uses: actions/github-script@v6
+        uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
+            const coverage = process.env.COVERAGE || "Failed to calculate";
+            const commentBody = `### Code Coverage Report\n\n- **Diff Coverage**: ${coverage}%\n\n*This comment was generated automatically by GitHub Actions.*`;
+            
+            // Posting the comment to the PR
+            const prNumber = context.payload.pull_request.number;
+            await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '### Code Coverage Report\n\n- **Diff Coverage**: ${{ env.COVERAGE }} d %\n\n*This comment was generated automatically by GitHub Actions.*'
-            })        
+              issue_number: prNumber,
+              body: commentBody
+            });   
 
       # Step 10: Upload coverage report as a downloadable artifact
       - name: Upload Diff-Cover HTML Report
