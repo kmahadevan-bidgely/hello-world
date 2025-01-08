@@ -18,6 +18,8 @@ jobs:
       # Step 1: Check out the code
       - name: Checkout Code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       # Step 2: Set up Java (JDK 11)
       - name: Set up JDK 11
