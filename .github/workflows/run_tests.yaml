@@ -55,7 +55,9 @@ jobs:
         id: diff-coverage
         run: |
           # Generating the diff
-          git diff origin/${{ github.base_ref }}...HEAD > diff.txt
+          CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          echo $CURRENT_BRANCH
+          git diff $CURRENT_BRANCH...HEAD > diff.txt
           
           # showing the diff
           cat diff.txt
