@@ -6,6 +6,7 @@ on:
       - created
 env:
   GH_TOKEN: ${{ github.token }}
+  ACTIONS_STEP_DEBUG: true
 
 jobs:
   test-and-coverage:
@@ -32,21 +33,25 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
           cache: 'maven'
+          check-latest: false
 
 
-      # Step 4: Run tests with JaCoCo coverage
+      # Step 3: Run tests with JaCoCo coverage
       - name: Run Tests and Generate Coverage
         run: mvn clean test jacoco:report
 
-      # Step 5: Set up Python and install diff-cover
+      # Step 4: Set up Python and install diff-cover
       - name: Set up Python and Install diff-cover
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
           cache: 'pip'
+
+      # Step 5: Install diff-cover
       - name: Install diff-cover
         run: pip install -r devtools/requirements.txt
 
+      # Step 6: Determine current branch name
       - name: Find current branch name using GH CLIs
         id: get_branch
         run: |
@@ -59,18 +64,11 @@ jobs:
           # Save the branch name as an output variable
           echo "branch_name=$PR_BRANCH" >> $GITHUB_OUTPUT
 
-      - name: Display branch name
-        if: false
-        run: echo "The branch name is ${{ steps.get_branch.outputs.branch_name }}"
-
-      - name: Print current branch name
-        shell: bash
-        run: git branch
-
-      # Fetch the main branch from the remote to compare with the current branch
+      # Step 7: Fetch the main branch from the remote to compare with the current branch
       - name: Fetch origin/main
         run: git fetch origin main
 
+      # Step 8: Evaluate coverage diff
       - name: Evaluate Coverage Diff
         id: diff-coverage
         run: |
@@ -79,13 +77,10 @@ jobs:
           git checkout ${{ steps.get_branch.outputs.branch_name }}
           git diff main..${{ steps.get_branch.outputs.branch_name }} > diff.txt
           
-          # showing the diff
-          cat diff.txt
-          
           # Run diff-cover
           diff-cover target/site/jacoco/jacoco.xml --diff-file=diff.txt --html-report diff-cover-report.html --fail-under=90 > diff-coverage-result.txt || true
 
-      # Step 8: Extract Coverage Numbers
+      # Step 9: Extract Coverage Numbers
       - name: Extract Coverage Numbers
         if: always()
         id: extract-coverage
@@ -102,7 +97,7 @@ jobs:
           # Get PR number from the event payload
           echo "PR=${{ github.event.issue.number }}" >> $GITHUB_ENV        
 
-      # Step 9: Post Coverage Comment on PR using github-script
+      # Step 10: Post Coverage Comment on PR using github-script
       - name: Post Coverage on PR
         if: always()
         uses: actions/github-script@v6
@@ -121,14 +116,14 @@ jobs:
               body: commentBody
             });   
 
-      # Step 10: Upload coverage report as a downloadable artifact
+      # Step 11: Upload coverage report as a downloadable artifact
       - name: Upload Diff-Cover HTML Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: diff-cover-report
           path: diff-cover-report.html
 
-      # Step 11: Fail build if coverage is below 90%
+      # Step 12: Fail build if coverage is below 90%
       - name: Fail Build if Coverage is Below Threshold
         run: |
           COVERAGE=${{ env.COVERAGE }}
