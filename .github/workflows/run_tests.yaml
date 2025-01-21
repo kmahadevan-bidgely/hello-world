@@ -64,6 +64,9 @@ jobs:
         if: false
         run: echo "The branch name is ${{ steps.get_branch.outputs.branch_name }}"
 
+      - name: Print current branch name
+        shell: bash
+        run: git branch
       # Fetch the main branch from the remote to compare with the current branch
       - name: Fetch origin/main
         run: git fetch origin main
