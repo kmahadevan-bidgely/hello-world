@@ -134,24 +134,33 @@ jobs:
           name: diff-cover-report
           path: diff-cover-report.html
 
-      - name: Report build as failed
-        if: ${{ env.COVERAGE }} < 90
+      - name: Report build status
         run: |
+          REPO="${{ github.repository }}"
+          COMMIT_SHA="${{ github.sha }}"
+          TOKEN="${{ secrets.GITHUB_TOKEN }}"
+          
+          # Set the status based on COVERAGE value
+          COVERAGE="${{ env.COVERAGE }}"
+          if [ "$COVERAGE" -ge 90 ]; then
+            STATUS_STATE="success"
+            STATUS_DESCRIPTION="CI build passed with ${COVERAGE}% coverage"
+          else
+            STATUS_STATE="failure"
+            STATUS_DESCRIPTION="CI build failed with ${COVERAGE}% coverage"
+          fi
+          
+          STATUS_CONTEXT="ci/build"
+          
           curl -X POST \
-          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          -H "Accept: application/vnd.github.v3+json" \
-          -d '{"state":"'"failure"'","description":"CI build status","context":"test-and-coverage"}' \
-          "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
-
-
-      - name: Report build as success
-        if: ${{ env.COVERAGE }} >= 90
-        run: |
-          curl -X POST \
-          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          -H "Accept: application/vnd.github.v3+json" \
-          -d '{"state":"'"success"'","description":"CI build status","context":"test-and-coverage"}' \
-          "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
+            -H "Authorization: token ${TOKEN}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            -d '{
+              "state": "'"${STATUS_STATE}"'",
+              "description": "'"${STATUS_DESCRIPTION}"'",
+              "context": "'"${STATUS_CONTEXT}"'"
+            }' \
+            "https://api.github.com/repos/${REPO}/statuses/${COMMIT_SHA}"
 
       # Step 12: Fail build if coverage is below 90%
       - name: Fail build if coverage is below threshold
