@@ -9,8 +9,7 @@ jobs:
   test-and-coverage:
     runs-on: ubuntu-latest
     if: >
-      github.event.comment.body == '/run-ci' &&  # Check if comment matches
-      github.event.issue.pull_request != null       # Ensure it's a PR comment
+      github.event.comment.body == '/run-ci' &&  github.event.issue.pull_request != null
     permissions:
       contents: write
       pull-requests: write
