@@ -65,6 +65,8 @@ jobs:
       # Step 6: Determine current branch name
       - name: Find current branch name using GH CLIs
         id: get_branch
+        env:
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
         run: |
           # Get PR number from the event payload
           PR_NUMBER=${{ github.event.issue.number }}
@@ -74,6 +76,9 @@ jobs:
           
           # Save the branch name as an output variable
           echo "branch_name=$PR_BRANCH" >> $GITHUB_OUTPUT
+          # Extract the PR head SHA from the GitHub event payload
+          PR_COMMIT_SHA=$(jq -r .pull_request.head.sha < "$GITHUB_EVENT_PATH")
+          echo "commit_sha=$PR_COMMIT_SHA" >> $GITHUB_OUTPUT
 
       # Step 7: Fetch the main branch from the remote to compare with the current branch
       - name: Fetch origin/main
@@ -137,7 +142,7 @@ jobs:
       - name: Report build status
         run: |
           REPO="${{ github.repository }}"
-          COMMIT_SHA="${{ github.sha }}"
+          COMMIT_SHA="${{ steps.get_branch.outputs.commit_sha }} "
           TOKEN="${{ secrets.GITHUB_TOKEN }}"
           
           # Set the status based on COVERAGE value
