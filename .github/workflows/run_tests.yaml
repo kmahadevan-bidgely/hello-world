@@ -96,6 +96,12 @@ jobs:
           echo "COVERAGE=$COVERAGE" >> $GITHUB_ENV
         shell: bash
 
+      - name: Get PR Number
+        if: always()
+        run: |
+          # Get PR number from the event payload
+          echo "PR=${{ github.event.issue.number }}" >> $GITHUB_ENV        
+
       # Step 9: Post Coverage Comment on PR using github-script
       - name: Post Coverage on PR
         if: always()
@@ -107,7 +113,7 @@ jobs:
             const commentBody = `### Code Coverage Report\n\n- **Diff Coverage**: ${coverage}%\n\n*This comment was generated automatically by GitHub Actions.*`;
             
             // Posting the comment to the PR
-            const prNumber = github.context.payload.pull_request.number;
+            const prNumber = process.env.PR
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
