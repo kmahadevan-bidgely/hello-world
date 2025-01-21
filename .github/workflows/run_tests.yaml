@@ -35,6 +35,13 @@ jobs:
           cache: 'maven'
           check-latest: false
 
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-
 
       # Step 3: Run tests with JaCoCo coverage
       - name: Run Tests and Generate Coverage
