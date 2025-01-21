@@ -35,16 +35,13 @@ jobs:
           cache: 'maven'
           check-latest: false
 
-      - name: Restore Maven cache
-        uses: skjolber/maven-cache-github-action@v3.1.1
+      - name: Cache local Maven repository
+        uses: actions/cache@v4
         with:
-          step: restore
-
-      - name: Save Maven cache
-        if: always()
-        uses: skjolber/maven-cache-github-action@v3.1.1
-        with:
-          step: save
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
 
       # Step 3: Run tests with JaCoCo coverage
       - name: Run Tests and Generate Coverage
@@ -56,6 +53,13 @@ jobs:
         with:
           python-version: '3.9'
           cache: 'pip'
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       # Step 5: Install diff-cover
       - name: Install diff-cover
