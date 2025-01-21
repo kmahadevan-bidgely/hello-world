@@ -76,9 +76,9 @@ jobs:
           FULL_JSON=$(gh pr view $PR_NUMBER --json headRefOid,headRefName)
           
           # Extract branch name from the json
-          PR_BRANCH=$(echo $FULL_JSON -r '.headRefName')
+          PR_BRANCH=$(echo $FULL_JSON | jq -r '.headRefName')
           # Extract the PR head SHA from the json
-          PR_COMMIT_SHA=$(echo $FULL_JSON -r '.headRefOid')
+          PR_COMMIT_SHA=$(echo $FULL_JSON | jq -r '.headRefOid')
           
           # Save the branch name and commit_sha as an output variable
           echo "branch_name=$PR_BRANCH" >> $GITHUB_OUTPUT
