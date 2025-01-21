@@ -38,16 +38,6 @@ jobs:
       - name: Run Tests and Generate Coverage
         run: mvn clean test jacoco:report
 
-      # Step 4: Save Maven dependencies in cache
-      - name: Cache Maven dependencies
-        if: always()  # Ensure it runs regardless of the previous step's result
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
       # Step 4: Set up Python and install diff-cover
       - name: Set up Python and Install diff-cover
         uses: actions/setup-python@v4
@@ -137,3 +127,14 @@ jobs:
         with:
           script: |
             core.setFailed('Error: Diff coverage ${{ env.COVERAGE }} is below the threshold 90')
+
+      # Step 13: Save Maven dependencies in cache
+      - name: Cache Maven dependencies
+        if: always()  # Ensure it runs regardless of the previous step's result
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
