@@ -78,9 +78,7 @@ jobs:
           # Extract branch name from the json
           PR_BRANCH=$(echo $FULL_JSON | jq -r '.headRefName')
           # Extract the PR head SHA from the json
-          raw=$(echo $FULL_JSON | jq -r '.headRefOid')
-          # Trim the spaces
-          PR_COMMIT_SHA=$(echo "$raw" | awk '{$1=$1;print}')
+          PR_COMMIT_SHA=$(echo $FULL_JSON | jq -r '.headRefOid')
           
           # Save the branch name and commit_sha as an output variable
           echo "branch_name=$PR_BRANCH" >> $GITHUB_OUTPUT
@@ -148,7 +146,7 @@ jobs:
       - name: Report build status
         run: |
           REPO="${{ github.repository }}"
-          COMMIT_SHA="${{ steps.get_branch.outputs.commit_sha }} "
+          COMMIT_SHA="${{ steps.get_branch.outputs.commit_sha }}"
           TOKEN="${{ secrets.GITHUB_TOKEN }}"
           
           # Set the status based on COVERAGE value
