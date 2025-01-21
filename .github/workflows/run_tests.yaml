@@ -68,19 +68,20 @@ jobs:
       # Step 6: Determine current branch name
       - name: Find current branch name using GH CLIs
         id: get_branch
-        env:
-          GITHUB_EVENT_PATH: ${{ github.event_path }}
         run: |
           # Get PR number from the event payload
           PR_NUMBER=${{ github.event.issue.number }}
           
           # Fetch PR details using GitHub CLI
-          PR_BRANCH=$(gh pr view $PR_NUMBER --json headRefName -q '.headRefName')
+          FULL_JSON=$(gh pr view $PR_NUMBER --json headRefOid,headRefName)
           
-          # Save the branch name as an output variable
+          # Extract branch name from the json
+          PR_BRANCH=$(echo $FULL_JSON -r '.headRefName')
+          # Extract the PR head SHA from the json
+          PR_COMMIT_SHA=$(echo $FULL_JSON -r '.headRefOid')
+          
+          # Save the branch name and commit_sha as an output variable
           echo "branch_name=$PR_BRANCH" >> $GITHUB_OUTPUT
-          # Extract the PR head SHA from the GitHub event payload
-          PR_COMMIT_SHA=$(jq -r .pull_request.head.sha < "$GITHUB_EVENT_PATH")
           echo "commit_sha=$PR_COMMIT_SHA" >> $GITHUB_OUTPUT
 
       # Step 7: Fetch the main branch from the remote to compare with the current branch
