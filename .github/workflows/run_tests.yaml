@@ -48,6 +48,7 @@ jobs:
         run: pip install -r devtools/requirements.txt
 
       - name: Find current branch name using GH CLIs
+        if: false
         id: get_branch
         run: |
           # Get PR number from the event payload
@@ -60,8 +61,13 @@ jobs:
           echo "branch_name=$PR_BRANCH" >> $GITHUB_OUTPUT
 
       - name: Display branch name
+        if: false
         run: echo "The branch name is ${{ steps.get_branch.outputs.branch_name }}"
-      # Step 7: Evaluate coverage diff using diff-cover
+
+      # Fetch the main branch from the remote to compare with the current branch
+      - name: Fetch origin/main
+        run: git fetch origin main
+
       - name: Evaluate Coverage Diff
         id: diff-coverage
         run: |
