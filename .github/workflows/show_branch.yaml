@@ -1,4 +1,4 @@
-name: Test and Coverage Check
+name: Show branch name of pull request
 
 on:
   pull_request:
@@ -30,7 +30,7 @@ jobs:
         if: github.event_name != 'pull_request'
         id: branch-name
         shell: bash
-        run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | tr / -)" >> $GITHUB_ENV
+        run: echo "BRANCH_NAME=$(echo $GITHUB_REF_NAME | tr / -)" >> $GITHUB_ENV
 
       - name: Get branch name (pull request)
         if: github.event_name == 'pull_request'
