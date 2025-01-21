@@ -195,7 +195,8 @@ jobs:
 
       # Step 12: Fail build if coverage is below 90%
       - name: Fail build if coverage is below threshold
-        if: ${{ env.COVERAGE }} < 90
+        # Parse env.COVERAGE as a number before comparing
+        if: ${{ env.COVERAGE != '' && (env.COVERAGE | fromJSON) < 90 }}
         uses: actions/github-script@v3
         with:
           script: |
