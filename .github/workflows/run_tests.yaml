@@ -168,6 +168,7 @@ jobs:
           path: diff-cover-report.html
 
       - name: Report build status
+        if: always()
         run: |
           REPO="${{ github.repository }}"
           COMMIT_SHA="${{ steps.get_branch.outputs.commit_sha }}"
