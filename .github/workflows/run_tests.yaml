@@ -1,13 +1,16 @@
 name: Test and Coverage Check
 
 on:
-  pull_request:
-    branches:
-      - '**'
+  issue_comment:
+    types:
+      - created
 
 jobs:
   test-and-coverage:
     runs-on: ubuntu-latest
+    if: >
+      github.event.comment.body == '/run-ci' &&  # Check if comment matches
+      github.event.issue.pull_request != null       # Ensure it's a PR comment
     permissions:
       contents: write
       pull-requests: write
@@ -17,16 +20,18 @@ jobs:
     steps:
       # Step 1: Check out the code
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       # Step 2: Set up Java (JDK 11)
       - name: Set up JDK 11
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '11'
           distribution: 'temurin'
+          cache: 'maven'
+
 
       # Step 3: Cache Maven dependencies
       - name: Cache Maven Dependencies
@@ -46,6 +51,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
+          cache: 'pip'
       - name: Install diff-cover
         run: pip install diff-cover
 
