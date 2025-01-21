@@ -130,8 +130,13 @@ jobs:
         id: extract-coverage
         run: |
           cat diff-coverage-result.txt
-          COVERAGE=$(grep "Coverage:" diff-coverage-result.txt | awk '{print $2}' | tr -d '%')
-          COVERAGE=${COVERAGE:--99}
+          if grep -q "No lines with coverage information in this diff." diff-coverage-result.txt; then
+            COVERAGE=-99
+          else
+            COVERAGE=$(grep "Coverage:" diff-coverage-result.txt | awk '{print $2}' | tr -d '%')
+          fi
+          # Check if COVERAGE is empty or has a value of -99, and assign a default if needed
+          #COVERAGE=${COVERAGE:- -99}
           echo "COVERAGE=$COVERAGE"
           echo "COVERAGE=$COVERAGE" >> $GITHUB_ENV
         shell: bash
