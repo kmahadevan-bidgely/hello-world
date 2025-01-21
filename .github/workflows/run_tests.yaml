@@ -119,10 +119,10 @@ jobs:
           git checkout ${{ steps.get_branch.outputs.branch_name }}
           git diff main..${{ steps.get_branch.outputs.branch_name }} > diff.txt
           
-          cat diff.txt
-          
           # Run diff-cover
           diff-cover target/site/jacoco/jacoco.xml --diff-file=diff.txt --html-report diff-cover-report.html --fail-under=90 > diff-coverage-result.txt || true
+          
+          cat diff-coverage-result.txt
 
       # Step 9: Extract Coverage Numbers
       - name: Extract Coverage Numbers
