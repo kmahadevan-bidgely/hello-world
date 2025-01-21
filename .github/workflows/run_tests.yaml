@@ -32,21 +32,24 @@ jobs:
         with:
           java-version: '11'
           distribution: 'temurin'
-          cache: 'maven'
 
-      # Step 13: Save Maven dependencies in cache
-      - name: Cache Maven dependencies
-        if: always()  # Ensure it runs regardless of the previous step's result
-        uses: actions/cache@v4
+      - name: Restore Maven dependencies from cache
+        uses: actions/cache/restore@v4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
+        continue-on-error: true
 
       # Step 3: Run tests with JaCoCo coverage
       - name: Run Tests and Generate Coverage
         run: mvn clean test jacoco:report
+
+      - name: Save Maven dependencies into cache
+        uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
 
       # Step 4: Set up Python and install diff-cover
       - name: Set up Python and Install diff-cover
