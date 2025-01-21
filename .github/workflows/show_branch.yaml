@@ -1,0 +1,43 @@
+name: Test and Coverage Check
+
+on:
+  pull_request:
+    branches:
+      - '**'
+  issue_comment:
+    types:
+      - created
+
+jobs:
+  test-and-coverage:
+    runs-on: ubuntu-latest
+    if: >
+      github.event.comment.body == '/show' &&  github.event.issue.pull_request != null
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
+      id-token: write
+
+    steps:
+      # Step 1: Check out the code
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get branch name (Non pull requests)
+        if: github.event_name != 'pull_request'
+        id: branch-name
+        shell: bash
+        run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | tr / -)" >> $GITHUB_ENV
+
+      - name: Get branch name (pull request)
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF} | tr / -)" >> $GITHUB_ENV
+
+      - name: Debug
+        run: echo ${{ env.BRANCH_NAME }}
+
+
