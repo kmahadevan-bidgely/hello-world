@@ -48,7 +48,6 @@ jobs:
         run: pip install -r devtools/requirements.txt
 
       - name: Find current branch name using GH CLIs
-        if: false
         id: get_branch
         run: |
           # Get PR number from the event payload
@@ -67,6 +66,7 @@ jobs:
       - name: Print current branch name
         shell: bash
         run: git branch
+
       # Fetch the main branch from the remote to compare with the current branch
       - name: Fetch origin/main
         run: git fetch origin main
@@ -75,10 +75,10 @@ jobs:
         id: diff-coverage
         run: |
           # Generating the diff
-          #git diff ${{ steps.get_branch.outputs.branch_name }}...HEAD > diff.txt
+          git diff main..${{ steps.get_branch.outputs.branch_name }} > diff.txt
           
           # showing the diff
-          #cat diff.txt
+          cat diff.txt
           
           # Run diff-cover
           diff-cover target/site/jacoco/jacoco.xml --compare-branch=origin/main --html-report diff-cover-report.html --fail-under=90 || true > diff-coverage-result.txt
