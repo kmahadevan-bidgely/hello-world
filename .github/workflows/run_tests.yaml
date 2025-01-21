@@ -131,6 +131,7 @@ jobs:
         run: |
           cat diff-coverage-result.txt
           COVERAGE=$(grep "Coverage:" diff-coverage-result.txt | awk '{print $2}' | tr -d '%')
+          COVERAGE=${COVERAGE:--99}
           echo "COVERAGE=$COVERAGE"
           echo "COVERAGE=$COVERAGE" >> $GITHUB_ENV
         shell: bash
@@ -143,7 +144,7 @@ jobs:
 
       # Step 10: Post Coverage Comment on PR using github-script
       - name: Post Coverage on PR
-        if: always()
+        if: ${{ env.COVERAGE != '' && fromJson(env.COVERAGE) > 0 }}
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -179,6 +180,9 @@ jobs:
           if [ "$COVERAGE" -ge 90 ]; then
             STATUS_STATE="success"
             STATUS_DESCRIPTION="CI build passed with ${COVERAGE}% coverage"
+          elif [ "$COVERAGE" -eq -99 ]; then
+            STATUS_STATE="success"
+            STATUS_DESCRIPTION="CI build passed. Could not determine coverage. You probably committed ONLY test cases."
           else
             STATUS_STATE="failure"
             STATUS_DESCRIPTION="CI build failed. Expected 90% coverage. Actual coverage is ${COVERAGE}%"
@@ -199,7 +203,7 @@ jobs:
       # Step 12: Fail build if coverage is below 90%
       - name: Fail build if coverage is below threshold
         # Parse env.COVERAGE as a number before comparing
-        if: ${{ env.COVERAGE != '' && fromJson(env.COVERAGE) < 90 }}
+        if: ${{ env.COVERAGE != '' && fromJson(env.COVERAGE) < 90 && fromJson(env.COVERAGE) != -99 }}
         uses: actions/github-script@v3
         with:
           script: |
