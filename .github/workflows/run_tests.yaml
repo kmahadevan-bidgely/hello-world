@@ -62,9 +62,6 @@ jobs:
       - name: Install diff-cover
         run: pip install -r devtools/requirements.txt
 
-      - name: Debug Event Payload
-        run: cat $GITHUB_EVENT_PATH
-
       # Step 6: Determine current branch name
       - name: Find current branch name using GH CLIs
         id: get_branch
@@ -156,7 +153,7 @@ jobs:
             STATUS_DESCRIPTION="CI build passed with ${COVERAGE}% coverage"
           else
             STATUS_STATE="failure"
-            STATUS_DESCRIPTION="CI build failed with ${COVERAGE}% coverage"
+            STATUS_DESCRIPTION="CI build failed. Expected 90% coverage. Actual coverage is ${COVERAGE}%"
           fi
           
           STATUS_CONTEXT="ci/build"
