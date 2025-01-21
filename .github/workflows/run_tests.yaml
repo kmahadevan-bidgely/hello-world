@@ -92,8 +92,8 @@ jobs:
         run: |
           cat diff-coverage-result.txt
           COVERAGE=$(grep "Coverage:" diff-coverage-result.txt | awk '{print $2}' | tr -d '%')
-          echo "COVERAGE=${COVERAGE}"
-          echo "COVERAGE=${COVERAGE}" >> $GITHUB_ENV
+          echo "COVERAGE=$COVERAGE"
+          echo "COVERAGE=$COVERAGE" >> $GITHUB_ENV
         shell: bash
 
       # Step 9: Post Coverage Comment on PR using github-script
