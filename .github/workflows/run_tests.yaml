@@ -156,7 +156,7 @@ jobs:
             STATUS_DESCRIPTION="CI build failed. Expected 90% coverage. Actual coverage is ${COVERAGE}%"
           fi
           
-          STATUS_CONTEXT="ci/build"
+          STATUS_CONTEXT="test-and-coverage"
           
           curl -X POST \
             -H "Authorization: token ${TOKEN}" \
