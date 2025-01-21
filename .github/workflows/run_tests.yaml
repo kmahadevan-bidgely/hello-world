@@ -75,6 +75,7 @@ jobs:
         id: diff-coverage
         run: |
           # Generating the diff
+          git fetch origin ${{ steps.get_branch.outputs.branch_name }} 
           git checkout ${{ steps.get_branch.outputs.branch_name }}
           git diff main..${{ steps.get_branch.outputs.branch_name }} > diff.txt
           
