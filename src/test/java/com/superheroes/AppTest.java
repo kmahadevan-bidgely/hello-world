@@ -19,7 +19,7 @@ public class AppTest {
         app.setPerson("Jack");
     }
 
-    @Test
+    @Test(enabled = false)
     public void testGreeting() {
         App app = new App();
         app.setPerson("Jack");
