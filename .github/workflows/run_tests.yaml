@@ -66,17 +66,17 @@ jobs:
         id: diff-coverage
         run: |
           # Generating the diff
-          git diff ${{ steps.get_branch.outputs.branch_name }}...HEAD > diff.txt
+          #git diff ${{ steps.get_branch.outputs.branch_name }}...HEAD > diff.txt
           
           # showing the diff
-          cat diff.txt
+          #cat diff.txt
           
           # Run diff-cover
-          #diff-cover target/site/jacoco/jacoco.xml --compare-branch=origin/main --html-report diff-cover-report.html > diff-coverage-result.txt
-          #diff-cover target/site/jacoco/jacoco.xml --compare-branch=origin/main --html-report diff-cover-report.html --fail-under=90 || true
+          diff-cover target/site/jacoco/jacoco.xml --compare-branch=origin/main --html-report diff-cover-report.html > diff-coverage-result.txt
+          diff-cover target/site/jacoco/jacoco.xml --compare-branch=origin/main --html-report diff-cover-report.html --fail-under=90 || true
 
-          diff-cover target/site/jacoco/jacoco.xml --diff-file=diff.txt --html-report diff-cover-report.html > diff-coverage-result.txt
-          diff-cover target/site/jacoco/jacoco.xml ---diff-file=diff.txt --html-report diff-cover-report.html --fail-under=90 || true
+          #diff-cover target/site/jacoco/jacoco.xml --diff-file=diff.txt --html-report diff-cover-report.html > diff-coverage-result.txt
+          #diff-cover target/site/jacoco/jacoco.xml ---diff-file=diff.txt --html-report diff-cover-report.html --fail-under=90 || true
 
       # Step 8: Extract Coverage Numbers
       - name: Extract Coverage Numbers
