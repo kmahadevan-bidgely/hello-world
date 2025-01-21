@@ -133,6 +133,16 @@ jobs:
           name: diff-cover-report
           path: diff-cover-report.html
 
+      - name: Report build as failed
+        if: ${{ env.COVERAGE }} < 90
+        run:
+          gh pr checks --repo ${{ github.repository }} --status failure
+
+      - name: Report build as success
+        if: ${{ env.COVERAGE }} >= 90
+        run:
+          gh pr checks --repo ${{ github.repository }} --status success
+
       # Step 12: Fail build if coverage is below 90%
       - name: Fail build if coverage is below threshold
         if: ${{ env.COVERAGE }} < 90
