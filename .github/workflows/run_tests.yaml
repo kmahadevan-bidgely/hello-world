@@ -33,15 +33,7 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
           cache: 'maven'
-          check-latest: false
 
-#      - name: Cache local Maven repository
-#        uses: actions/cache@v4
-#        with:
-#          path: ~/.m2/repository
-#          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-#          restore-keys: |
-#            ${{ runner.os }}-maven-
 
       # Step 3: Run tests with JaCoCo coverage
       - name: Run Tests and Generate Coverage
@@ -52,14 +44,6 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-#          cache: 'pip'
-
-#      - uses: actions/cache@v4
-#        with:
-#          path: ~/.cache/pip
-#          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-#          restore-keys: |
-#            ${{ runner.os }}-pip-
 
       # Step 5: Install diff-cover
       - name: Install diff-cover
@@ -138,13 +122,20 @@ jobs:
           path: diff-cover-report.html
 
       # Step 12: Fail build if coverage is below 90%
-      - name: Fail Build if Coverage is Below Threshold
-        run: |
-          COVERAGE=${{ env.COVERAGE }}
-          THRESHOLD=90
-          if [[ "$COVERAGE" -lt "$THRESHOLD" ]]; then
-            echo "Error: Diff coverage ($COVERAGE%) is below the threshold ($THRESHOLD%)"
-            exit 1
-          fi
-        shell: bash
-        continue-on-error: true
+      - name: Fail build if coverage is below threshold
+        if: ${{ env.COVERAGE }} < 90
+        uses: actions/github-script@v3
+      - with:
+          script: |
+            core.setFailed('Error: Diff coverage ${{ env.COVERAGE }} is below the threshold 90')
+
+#      - name: Fail Build if Coverage is Below Threshold
+#        run: |
+#          COVERAGE=${{ env.COVERAGE }}
+#          THRESHOLD=90
+#          if [[ "$COVERAGE" -lt "$THRESHOLD" ]]; then
+#            echo "Error: Diff coverage ($COVERAGE%) is below the threshold ($THRESHOLD%)"
+#            exit 1
+#          fi
+#        shell: bash
+#        continue-on-error: true
