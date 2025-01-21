@@ -40,4 +40,18 @@ jobs:
       - name: Debug
         run: echo ${{ env.BRANCH_NAME }}
 
+      - name: Find branch name using GH CLIs
+        id: get_branch
+        run: |
+          # Get PR number from the event payload
+          PR_NUMBER=${{ github.event.issue.number }}
+          
+          # Fetch PR details using GitHub CLI
+          PR_BRANCH=$(gh pr view $PR_NUMBER --json headRefName -q '.headRefName')
+          
+          # Save the branch name as an output variable
+          echo "branch_name=$PR_BRANCH" >> $GITHUB_OUTPUT
+
+      - name: Display branch name
+        run: echo "The branch name is ${{ steps.get_branch.outputs.branch_name }}"
 
