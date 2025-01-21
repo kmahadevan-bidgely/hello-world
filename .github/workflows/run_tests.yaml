@@ -45,19 +45,26 @@ jobs:
       - name: Install diff-cover
         run: pip install -r devtools/requirements.txt
 
-      # Step 6: Determine the Default Branch
-      - name: Determine Default Branch
-        id: default-branch
-        run: echo "DEFAULT_BRANCH=${{ github.event.repository.default_branch }}" >> $GITHUB_ENV
+      - name: Find current branch name using GH CLIs
+        id: get_branch
+        run: |
+          # Get PR number from the event payload
+          PR_NUMBER=${{ github.event.issue.number }}
+          
+          # Fetch PR details using GitHub CLI
+          PR_BRANCH=$(gh pr view $PR_NUMBER --json headRefName -q '.headRefName')
+          
+          # Save the branch name as an output variable
+          echo "branch_name=$PR_BRANCH" >> $GITHUB_OUTPUT
 
+      - name: Display branch name
+        run: echo "The branch name is ${{ steps.get_branch.outputs.branch_name }}"
       # Step 7: Evaluate coverage diff using diff-cover
       - name: Evaluate Coverage Diff
         id: diff-coverage
         run: |
           # Generating the diff
-          CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-          echo $CURRENT_BRANCH
-          git diff $CURRENT_BRANCH...HEAD > diff.txt
+          git diff ${{ steps.get_branch.outputs.branch_name }}...HEAD > diff.txt
           
           # showing the diff
           cat diff.txt
