@@ -107,7 +107,7 @@ jobs:
             const commentBody = `### Code Coverage Report\n\n- **Diff Coverage**: ${coverage}%\n\n*This comment was generated automatically by GitHub Actions.*`;
             
             // Posting the comment to the PR
-            const prNumber = context.payload.pull_request.number;
+            const prNumber = github.context.payload.pull_request.number;
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
