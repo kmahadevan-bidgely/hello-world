@@ -32,15 +32,6 @@ jobs:
           cache: 'maven'
 
 
-      # Step 3: Cache Maven dependencies
-      - name: Cache Maven Dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
       # Step 4: Run tests with JaCoCo coverage
       - name: Run Tests and Generate Coverage
         run: mvn clean test jacoco:report
@@ -52,7 +43,7 @@ jobs:
           python-version: '3.9'
           cache: 'pip'
       - name: Install diff-cover
-        run: pip install diff-cover
+        run: pip install -r devtools/requirements.txt
 
       # Step 6: Determine the Default Branch
       - name: Determine Default Branch
