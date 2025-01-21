@@ -125,7 +125,7 @@ jobs:
       - name: Fail build if coverage is below threshold
         if: ${{ env.COVERAGE }} < 90
         uses: actions/github-script@v3
-      - with:
+        with:
           script: |
             core.setFailed('Error: Diff coverage ${{ env.COVERAGE }} is below the threshold 90')
 
