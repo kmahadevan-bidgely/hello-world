@@ -43,8 +43,8 @@ jobs:
 
       - name: Debug
         run: > 
-          'echo Non PR:' ${{ env.BRANCH_NAME1 }}
-          'echo PR    :' ${{ env.BRANCH_NAME2 }}
+          echo 'Non PR:' ${{ env.BRANCH_NAME1 }}
+          echo 'PR    :' ${{ env.BRANCH_NAME2 }}
 
       - name: Find branch name using GH CLIs
         id: get_branch
