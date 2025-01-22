@@ -2,7 +2,7 @@ name: Enforce Branch Naming Convention
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened]
 
 env:
   GH_TOKEN: ${{ github.token }}
