@@ -11,4 +11,8 @@ public class App {
     public void setPerson(String user) {
         this.user = user;
     }
+
+    public String getPerson() {
+        return this.user;
+    }
 }
