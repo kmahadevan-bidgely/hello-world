@@ -1,5 +1,8 @@
 package com.superheroes;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class App {
 
     private String user = "";
@@ -14,5 +17,11 @@ public class App {
 
     public String getPerson() {
         return this.user;
+    }
+
+    public Map<String, String> getUserAttributes() {
+        Map<String, String> result = new HashMap<>();
+        result.put("name", user);
+        return result;
     }
 }
