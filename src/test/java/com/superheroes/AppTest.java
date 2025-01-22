@@ -35,9 +35,18 @@ public class AppTest {
 
     @Test
     public void testGetUserAttributesLevel1() {
+        runTest(1);
+    }
+
+    @Test
+    public void testGetUserAttributesLevel2() {
+        runTest(2);
+    }
+
+    private void runTest(int level) {
         App app = new App();
         app.setPerson("Dragon Warrior");
-        Map<String, String> result = app.getUserAttributes(1);
+        Map<String, String> result = app.getUserAttributes(level);
         assertFalse(result.isEmpty());
         assertTrue(result.containsKey("level"));
     }
