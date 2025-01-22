@@ -1,0 +1,56 @@
+name: Enforce Branch Naming Convention
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  enforce-branch-naming:
+    runs-on: ubuntu-latest
+    steps:
+      # Retrieve the branch name directly from the event payload
+      - name: Validate branch name
+        id: validate
+        run: |
+          BRANCH_NAME="${{ github.head_ref }}"
+          echo "Branch name: $BRANCH_NAME"
+          
+          # Define valid branch prefixes
+          VALID_PREFIXES=("feature" "bugfix" "hotfix" "task" "release" "exclude")
+
+          # Check if branch name starts with any valid prefix
+          VALID=false
+          for PREFIX in "${VALID_PREFIXES[@]}"; do
+            if [[ "$BRANCH_NAME" == "$PREFIX"* ]]; then
+              VALID=true
+              break
+            fi
+          done
+
+          # Set the validation result as an environment file output
+          echo "valid=$VALID" >> $GITHUB_ENV
+
+      # Log a comment on the PR if the branch name is invalid
+      - name: Log comment on the PR
+        if: env.valid == 'false'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: `The branch name \`${{ github.head_ref }}\` does not meet the naming conventions. Please rename it to begin with one of the following prefixes: feature, bugfix, hotfix, task, release, exclude.`
+            })
+
+      # Close the PR if the branch name is invalid
+      - name: Close the PR
+        if: env.valid == 'false'
+        run: |
+          gh pr close ${{ github.event.pull_request.number }} \
+            --repo ${{ github.repository }} \
+            --comment "Closing PR as the branch name does not adhere to naming conventions."
