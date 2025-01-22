@@ -43,6 +43,11 @@ public class AppTest {
         runTest(2);
     }
 
+    @Test
+    public void testGetAttributesLevel3() {
+        runTest(3);
+    }
+
     private void runTest(int level) {
         App app = new App();
         app.setPerson("Dragon Warrior");
