@@ -20,9 +20,18 @@ public class App {
         return this.user;
     }
 
-    public Map<String, String> getUserAttributes() {
+    public Map<String, String> getUserAttributes(int level) {
         Map<String, String> result = new HashMap<>();
         result.put("name", user);
+            result.put("level", Integer.toString(level));
+        if (level == 1) {
+            result.put("superpower", "disabled");
+        }
+        if (level >= 2) {
+            result.put("superpower", "enabled");
+            result.put("extra-lives", "enabled");
+            result.put("extra-health", "enabled");
+        }
         return result;
     }
 }

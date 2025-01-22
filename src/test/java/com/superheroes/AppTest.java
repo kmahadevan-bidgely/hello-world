@@ -1,10 +1,9 @@
 package com.superheroes;
 
 
-import static org.testng.Assert.assertTrue;
 
-import com.beust.ah.A;
-import org.testng.Assert;
+import java.util.Map;
+import static org.testng.Assert.*;
 import org.testng.annotations.Test;
 
 public class AppTest {
@@ -24,13 +23,22 @@ public class AppTest {
     public void testGreeting() {
         App app = new App();
         app.setPerson("Jack");
-        Assert.assertEquals(app.getGreeting(), "hello Jack");
+        assertEquals(app.getGreeting(), "hello Jack");
     }
 
     @Test
     public void testPrettyPrint() {
         App app = new App();
         app.setPerson("Po");
-        Assert.assertEquals(app.getPerson(), "Po");
+        assertEquals(app.getPerson(), "Po");
+    }
+
+    @Test
+    public void testGetUserAttributesLevel1() {
+        App app = new App();
+        app.setPerson("Dragon Warrior");
+        Map<String, String> result = app.getUserAttributes(1);
+        assertFalse(result.isEmpty());
+        assertTrue(result.containsKey("level"));
     }
 }
