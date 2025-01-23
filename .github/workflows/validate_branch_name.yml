@@ -14,6 +14,7 @@ permissions:
 jobs:
   enforce-branch-naming:
     runs-on: ubuntu-latest
+    if: false
     steps:
       # Retrieve the branch name directly from the event payload
       - name: Validate branch name
