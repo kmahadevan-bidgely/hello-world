@@ -58,7 +58,7 @@ jobs:
 
       # Close the PR if the branch name is invalid
       - name: Close the PR
-        if: env.valid == 'false' && ${{ env.HARD_FAIL }} == 'true'
+        if: ${{ env.valid == 'false' && env.HARD_FAIL == 'true' }}
         run: |
           gh pr close ${{ github.event.pull_request.number }} \
             --repo ${{ github.repository }} \
