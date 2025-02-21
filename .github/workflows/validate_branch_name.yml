@@ -6,6 +6,7 @@ on:
 
 env:
   GH_TOKEN: ${{ github.token }}
+  HARD_FAIL: false
 
 permissions:
   pull-requests: write
@@ -43,16 +44,21 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
+            const comment = `
+            🔴 **Error:** The branch name \`${{ github.head_ref }}\` does not meet the naming conventions.  
+            ⚠️ **Action Required:** Please rename it to begin with one of the following prefixes:  
+            ✅ \`feature/\`, \`bugfix/\`, \`hotfix/\`, \`task/\`, \`release/\`, \`exclude/\`.
+            `;
             github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.payload.pull_request.number,
-              body: `The branch name \`${{ github.head_ref }}\` does not meet the naming conventions. Please rename it to begin with one of the following prefixes: feature, bugfix, hotfix, task, release, exclude.`
+              body: comment
             })
 
       # Close the PR if the branch name is invalid
       - name: Close the PR
-        if: env.valid == 'false'
+        if: env.valid == 'false' && ${{ env.HARD_FAIL == 'true' }}
         run: |
           gh pr close ${{ github.event.pull_request.number }} \
             --repo ${{ github.repository }} \
