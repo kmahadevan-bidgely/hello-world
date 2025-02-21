@@ -24,7 +24,7 @@ jobs:
           echo "Branch name: $BRANCH_NAME"
           
           # Define valid branch prefixes
-          VALID_PREFIXES=("feature" "bugfix" "hotfix" "task" "release" "exclude")
+          VALID_PREFIXES=("feature/" "bugfix/" "hotfix/" "task/" "release" "exclude/")
 
           # Check if branch name starts with any valid prefix
           VALID=false
@@ -47,7 +47,7 @@ jobs:
             const comment = `
             🔴 **Error:** The branch name \`${{ github.head_ref }}\` does not meet the naming conventions.  
             ⚠️ **Action Required:** Please rename it to begin with one of the following prefixes:  
-            ✅ \`feature/\`, \`bugfix/\`, \`hotfix/\`, \`task/\`, \`release/\`, \`exclude/\`.
+            ✅ \`feature/\`, \`bugfix/\`, \`hotfix/\`, \`task/\`, \`release\`, \`exclude/\`.
             `;
             github.rest.issues.createComment({
               owner: context.repo.owner,
