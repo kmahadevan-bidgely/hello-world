@@ -1,0 +1,35 @@
+name: Log CI Run
+
+on:
+  pull_request:
+    branches:
+      - '**'
+  issue_comment:
+    types:
+      - created
+
+env:
+  GH_TOKEN: ${{ github.token }}
+jobs:
+  test-and-coverage:
+    env:
+      GH_TOKEN: ${{ github.token }}
+    runs-on: ubuntu-latest
+    if: >
+      github.event.comment.body == '/log' &&  github.event.issue.pull_request != null
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
+      id-token: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Post a comment back to the PR
+        run: |
+          gh issue comment ${{ github.event.issue.number }} \
+            --repo ${{ github.repository }} \
+            --body "✅ CI job started: [View Workflow Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"        
+
