@@ -19,29 +19,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Simple test with failing command
+      - name: Simple test with failing command - Correct approach
         if: ${{ github.event.inputs.test_type == 'simple' }}
         run: |
           echo "Step 1: About to run a command that will fail..."
-          # This command will fail with exit code 1
-          false
-          # Capture the exit code immediately
-          EXIT_CODE=$?
-          echo "Step 2: This line should execute after the failure"
-          echo "Exit code from the failed command: $EXIT_CODE"
-          
-          # Do some work based on the failure
-          if [ $EXIT_CODE -ne 0 ]; then
+          # This command will fail with exit code 1, but we use || to ensure execution continues
+          false || {
+            # Capture the exit code immediately
+            EXIT_CODE=$?
+            echo "Step 2: This line WILL execute after the failure because we used ||"
+            echo "Exit code from the failed command: $EXIT_CODE"
+
+            # Do some work based on the failure
             echo "Step 3: Failure detected, doing some recovery work..."
             # In our workflow, this is where we identify failed modules
-          fi
-          
-          echo "Step 4: This step will still run"
-          
-          # At the end, we exit with the original exit code
-          # This makes the overall step fail, but only after all our commands run
-          echo "Step 5: About to exit with code $EXIT_CODE"
-          exit $EXIT_CODE
+
+            echo "Step 4: This step will run because we used ||"
+
+            # At the end, we exit with the original exit code
+            # This makes the overall step fail, but only after all our commands run
+            echo "Step 5: About to exit with code $EXIT_CODE"
+            exit $EXIT_CODE
+          }
 
       - name: This step should run even if the previous step failed
         run: echo "This step ran after the failing step"
@@ -57,13 +56,13 @@ jobs:
         if: ${{ github.event.inputs.test_type == 'maven' }}
         run: |
           # Create a simple Maven project with a failing test
-          mkdir -p dummy/src/test/java
-          
+          mkdir -p src/test/java
+
           # Create a failing test
-          cat > dummy/src/test/java/FailingTest.java << 'EOF'
+          cat > src/test/java/FailingTest.java << 'EOF'
           import org.junit.Test;
           import static org.junit.Assert.*;
-          
+
           public class FailingTest {
               @Test
               public void testThatFails() {
@@ -71,9 +70,9 @@ jobs:
               }
           }
           EOF
-          
+
           # Create a simple pom.xml
-          cat > dummy/pom.xml << 'EOF'
+          cat > pom.xml << 'EOF'
           <project>
               <modelVersion>4.0.0</modelVersion>
               <groupId>com.example</groupId>
@@ -93,18 +92,17 @@ jobs:
               </properties>
           </project>
           EOF
-          
+
           echo "Step 1: About to run Maven test that will fail..."
           # This command will fail because the test is designed to fail
-          cd dummy 
-          mvn test -ntp
-          # Capture the exit code immediately
-          MAVEN_EXIT_CODE=$?
-          echo "Step 2: This line should execute after Maven failure"
-          echo "Exit code from Maven: $MAVEN_EXIT_CODE"
-          
-          # Do some work based on the failure
-          if [ $MAVEN_EXIT_CODE -ne 0 ]; then
+          # We use || to ensure execution continues after failure
+          mvn test || {
+            # Capture the exit code immediately
+            MAVEN_EXIT_CODE=$?
+            echo "Step 2: This line WILL execute after Maven failure because we used ||"
+            echo "Exit code from Maven: $MAVEN_EXIT_CODE"
+
+            # Do some work based on the failure
             echo "Step 3: Maven test failure detected, identifying failed tests..."
             # Find test failures
             FAILED_TESTS=$(find . -path "*/target/surefire-reports" -type d | while read -r report_dir; do
@@ -113,13 +111,13 @@ jobs:
               fi
             done)
             echo "Failed tests: $FAILED_TESTS"
-          fi
-          
-          echo "Step 4: This step will still run after Maven failure"
-          
-          # At the end, we exit with the original exit code
-          echo "Step 5: About to exit with Maven exit code $MAVEN_EXIT_CODE"
-          exit $MAVEN_EXIT_CODE
+
+            echo "Step 4: This step will run after Maven failure because we used ||"
+
+            # At the end, we exit with the original exit code
+            echo "Step 5: About to exit with Maven exit code $MAVEN_EXIT_CODE"
+            exit $MAVEN_EXIT_CODE
+          }
 
       - name: This step should run even if Maven failed
         run: echo "This step ran after the Maven step"
