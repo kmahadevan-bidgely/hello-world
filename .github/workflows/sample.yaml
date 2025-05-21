@@ -56,10 +56,10 @@ jobs:
         if: ${{ github.event.inputs.test_type == 'maven' }}
         run: |
           # Create a simple Maven project with a failing test
-          mkdir -p src/test/java
+          mkdir -p dummy/src/test/java
 
           # Create a failing test
-          cat > src/test/java/FailingTest.java << 'EOF'
+          cat > dummy/src/test/java/FailingTest.java << 'EOF'
           import org.junit.Test;
           import static org.junit.Assert.*;
 
@@ -72,7 +72,7 @@ jobs:
           EOF
 
           # Create a simple pom.xml
-          cat > pom.xml << 'EOF'
+          cat > dummy/pom.xml << 'EOF'
           <project>
               <modelVersion>4.0.0</modelVersion>
               <groupId>com.example</groupId>
@@ -96,7 +96,8 @@ jobs:
           echo "Step 1: About to run Maven test that will fail..."
           # This command will fail because the test is designed to fail
           # We use || to ensure execution continues after failure
-          mvn test || {
+          cd dummy
+          mvn test -ntp || {
             # Capture the exit code immediately
             MAVEN_EXIT_CODE=$?
             echo "Step 2: This line WILL execute after Maven failure because we used ||"
