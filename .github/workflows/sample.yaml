@@ -97,7 +97,7 @@ jobs:
           echo "Step 1: About to run Maven test that will fail..."
           # This command will fail because the test is designed to fail
           cd dummy 
-          mvn test
+          mvn test -ntp
           # Capture the exit code immediately
           MAVEN_EXIT_CODE=$?
           echo "Step 2: This line should execute after Maven failure"
